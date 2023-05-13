@@ -1,0 +1,5 @@
+*test*
+.db
+*.db
+__pycache__
+*todo*
