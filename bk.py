@@ -13,6 +13,14 @@ app = typer.Typer()
 if not path.exists(db): create_db()
 
 @app.command()
+def delete(id: int = None) -> None:
+    if not id: 
+        bk = get_choose_bk_by_user()
+    else:
+        bk = BK(tuple([id]))
+    bk.delete()
+
+@app.command()
 def list() -> None:
     l_bk = get_bk_titles()
     print('id\tname\t\tdescription')
