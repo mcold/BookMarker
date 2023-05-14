@@ -1,4 +1,8 @@
+python bk.py delete --id=<id>
+python bk.py delete
+python bk.py delete --id=<id>
 python bk.py list
+python bk.py list-marks --id=<id>
 python bk.py load
 python bk.py load --id=<id>
 python bk.py replace
@@ -7,3 +11,6 @@ python bk.py save
 python bk.py save <title>
 python bk.py save <title> <descr>
 python bk.py save --title=Something --descr="My description"
+python bk.py update --id=<id> --title=<title> --descr=<descr>
+python bk.py update-bk-marks-descr --id=<id>
+python bk.py update-bk-mark <id>

@@ -5,7 +5,8 @@ from db import Bookmark, BK, get_bk_titles, db, create_db
 import typer
 from os import path
 
-file_pref = 'product-preferences.xml' # TODO: change to path
+file_pref = 'C:\\Users\\mholo\\AppData\\Roaming\\SQL Developer\\system23.1.0.097.1607\\o.sqldeveloper\\product-preferences.xml'
+# file_pref = 'product-preferences.xml' # TODO: change to path
 final_tag = '</ide:preferences>\n'
 
 app = typer.Typer()
@@ -27,6 +28,14 @@ def list() -> None:
     print('-'*50)
     for i in range(len(l_bk)): print('{id}\t{title}\t{descr}'.format(id=l_bk[i].id, title=l_bk[i].name, descr=l_bk[i].descr))
     print('-'*50)
+
+@app.command()
+def list_marks(id: int = None):
+    if not id: 
+        bk = get_choose_bk_by_user()
+    else:
+        bk = BK(tuple([id]))
+    for mark in bk.bk_list: print(mark, '\n')
 
 @app.command()
 def load(id: int = None):
@@ -70,6 +79,40 @@ def save(title: str = None, descr: str = None):
         bk.descr = descr
     bk.save()
 
+@app.command()
+def update(id: int = None, title: str = None, descr: str = None):
+    if not id: 
+        bk = get_choose_bk_by_user()
+    else:
+        bk = BK(tuple([id]))
+    bk.name = title
+    bk.descr = descr
+    bk.update()
+
+@app.command()
+def update_bk_marks_descr(id: int = None):
+    if not id: 
+        bk = get_choose_bk_by_user()
+    else:
+        bk = BK(tuple([id]))
+    for mark in bk.bk_list:
+        print(mark)
+        print('-'*50)
+        new_descr = input('Enter new description / enter to save current: ')
+        mark.descr = new_descr
+        mark.update()
+        print('\n')
+
+@app.command()
+def update_bk_mark(id: int):
+    mark = Bookmark(tuple([id]))
+    mark.change_line()
+    mark.change_hotkey()
+    mark.change_descr()
+    mark.update()
+
+##############################################
+
 def change_descr():
     """
     Change description
@@ -88,12 +131,12 @@ def change_title():
 
 def get_bk_title_by_user() -> str:
     while True:
-        x = input("Title: \n")
+        x = input("Title: ")
         if x not in (None, '', '\n'): return x
 
 def get_bk_descr_by_user() -> str:
     while True:
-        x = input("Description: \n")
+        x = input("Description: ")
         if x not in (None, '', '\n'): return x
 
 def get_choose_bk_by_user() -> BK:
@@ -103,7 +146,7 @@ def get_choose_bk_by_user() -> BK:
     for i in range(len(l_bk)): print('{id}\t{title}\t{descr}'.format(id=l_bk[i].id, title=l_bk[i].name, descr=l_bk[i].descr))
     print('-'*50)
     while True:
-        x = int(input("Enter ID: \n"))
+        x = int(input("Enter ID: "))
         for bk in l_bk:
             if bk.id == x:
                 return bk
@@ -138,13 +181,13 @@ def get_xml_bk(file: str) -> BK:
 
 def save_xml_bk(bk: BK) -> None:
     l_pref_lines = []
-    with open(file_pref, mode = 'r') as f: 
+    with open(file_pref, mode = 'r', encoding='utf-8') as f: 
         for line in f.readlines():
             if line.find("WorksheetBookmarkOptions") < 0:
                 l_pref_lines.append(line)
             else:
                 break
-    with open(file=file_pref, mode='w') as f: f.write(get_xml_replace(l_pref_lines=l_pref_lines, bk=bk))
+    with open(file=file_pref, mode='w', encoding='utf-8') as f: f.write(get_xml_replace(l_pref_lines=l_pref_lines, bk=bk))
 
 if __name__ == "__main__":
     app()

@@ -1,5 +1,5 @@
 # coding: utf-8
-import sqlite3
+from sqlite3 import connect
 
 db = 'DB.db'
 
@@ -20,12 +20,16 @@ class Bookmark:
             self.url = None
             self.descr = None
         else:
-            self.id = t[0]
-            self.id_bk = t[1]
-            self.line = t[2]
-            self.hotkey = t[3]
-            self.url = t[4]
-            self.descr = t[5]
+            if len(t) == 1:
+                self.id = t[0]
+                self = self.get_mark()
+            else:
+                self.id = t[0]
+                self.id_bk = t[1]
+                self.line = t[2]
+                self.hotkey = t[3]
+                self.url = t[4]
+                self.descr = t[5]
     
     def __repr__(self) -> str:
         res = '         <hash>\n'
@@ -37,15 +41,58 @@ class Bookmark:
     
     def __str__(self) -> str:
         return 'id: {id}\nid_bk: {id_bk}\nline: {line}\nhotkey: {hotkey}\nurl: {url}\ndescr: {descr}'.format(id=self.id, id_bk=self.id_bk, line=self.line, hotkey=self.hotkey, url=self.url, descr=self.descr)
+    
+    def change_descr(self) -> str:
+        while True:
+            x = input("Description: \n")
+            if x not in (None, '', '\n'): self.descr = x
+
+    def change_hotkey(self) -> str:
+        while True:
+            x = input("Hotkey: \n")
+            if x not in (None, '', '\n'): self.hotkey = x
+
+    def change_line(self) -> str:
+        while True:
+            x = input("Line: \n")
+            if x not in (None, '', '\n'): self.line = x
+
+    def get_mark(self) -> None:
+        with connect(db) as conn:
+            cur = conn.cursor()
+            cur.execute("""
+                            select id,
+                                id_bk,
+                                line,
+                                hotkey,
+                                url,
+                                descr
+                            from bookmark
+                            where id = {id}
+                            order by id desc;
+                        """.format(id = self.id))
+        return Bookmark(cur.fetchone())
 
     def ins(self) -> None:
-        with sqlite3.connect(db) as conn:
+        with connect(db) as conn:
             cur = conn.cursor()
             cur.execute("""
                         insert into bookmark(id_bk, line, hotkey, url, descr)
                         values({id_bk}, {line}, {hotkey}, '{url}', '{descr}')
                     """.format(id_bk=self.id_bk, line=self.line, hotkey=self.hotkey, url=self.url, descr=self.descr))
-
+    
+    def update(self) -> None:
+        with connect(db) as conn:
+            cur = conn.cursor()
+            cur.execute("""
+                        update bookmark
+                           set line={line},
+                               hotkey={hotkey},
+                               url='{url}',
+                               descr = '{descr}'
+                          where id = {id_mark}
+                    """.format(line=self.line, hotkey=self.hotkey, url=self.url, descr=self.descr, id_mark=self.id))
+    
     def save(self) -> None:
         self.ins()
 
@@ -81,7 +128,7 @@ class BK:
         return res
 
     def get_bk(self):
-        with sqlite3.connect(db) as conn:
+        with connect(db) as conn:
             cur = conn.cursor()
             cur.execute("""
                         select name,
@@ -94,7 +141,7 @@ class BK:
         self.descr = t[1]
 
     def get_bks(self):
-        with sqlite3.connect(db) as conn:
+        with connect(db) as conn:
             cur = conn.cursor()
             cur.execute("""
                             select id,
@@ -110,7 +157,7 @@ class BK:
         return [Bookmark(result) for result in cur.fetchall()]
 
     def ins(self) -> None:
-        with sqlite3.connect(db) as conn:
+        with connect(db) as conn:
             cur = conn.cursor()
             cur.execute("""
                         insert into bk(name, descr)
@@ -123,7 +170,7 @@ class BK:
         self.id = cur.fetchone()[0]
 
     def delete(self) -> None:
-        with sqlite3.connect(db) as conn:
+        with connect(db) as conn:
             cur = conn.cursor()
             cur.execute("""
                         delete from bk
@@ -131,7 +178,7 @@ class BK:
                     """.format(id_bk=self.id))
 
     def delete_bkmarks(self) -> None:
-        with sqlite3.connect(db) as conn:
+        with connect(db) as conn:
             cur = conn.cursor()
             cur.execute("""
                         delete from bookmark
@@ -151,7 +198,7 @@ class BK:
                 bk_mark.save()
 
     def update(self) -> None:
-        with sqlite3.connect(db) as conn:
+        with connect(db) as conn:
             cur = conn.cursor()
             cur.execute("""
                         update bk
@@ -164,7 +211,7 @@ class BK:
 def get_bk_titles(name: str = None, descr: str = None) -> list:
     if name is None: name = ''
     if descr is None: descr = ''
-    with sqlite3.connect(db) as conn:
+    with connect(db) as conn:
         cur = conn.cursor()
         cur.execute("""
                     select id,
@@ -178,7 +225,7 @@ def get_bk_titles(name: str = None, descr: str = None) -> list:
     return [BK(result) for result in cur.fetchall()]
 
 def get_id_last_bk():
-    with sqlite3.connect(db) as conn:
+    with connect(db) as conn:
         cur = conn.cursor()
         cur.execute("""
                     select max(id)
@@ -187,7 +234,7 @@ def get_id_last_bk():
     return cur.fetchone()[0]
 
 def create_db():
-    with sqlite3.connect(db) as conn:
+    with connect(db) as conn:
         cur = conn.cursor()
         cur.execute("""
                     create table if not exists bk(id    integer primary key autoincrement,
