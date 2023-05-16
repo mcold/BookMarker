@@ -15,7 +15,7 @@ app = typer.Typer()
 if not path.exists(db): create_db(con=connect(db))
 con = connect(db)
 
-@app.command()
+@app.command(help='Add bk to collection')
 def add_bk_to_col(id_bk: int = None, id_col: int = None) -> None:
     if not id_bk:
         bk = get_choose_bk_by_user(con=con)
@@ -29,7 +29,7 @@ def add_bk_to_col(id_bk: int = None, id_col: int = None) -> None:
     bk.update(con=con)
     db_close(con=con)
 
-@app.command()
+@app.command(help='Create collection')
 def create_col(title: str = None, descr: str = None) -> None:
     c = Collection(con=con, t=tuple([]))
     if not title:
@@ -43,8 +43,8 @@ def create_col(title: str = None, descr: str = None) -> None:
     c.save(con=con)
     db_close(con=con)
 
-@app.command()
-def delete_col(id: int = None) -> None:
+@app.command(help='Delete collection')
+def del_col(id: int = None) -> None:
     if not id: 
         c = get_choose_col_by_user(con=con)
     else:
@@ -52,8 +52,8 @@ def delete_col(id: int = None) -> None:
     c.delete(con=con)
     db_close(con=con)
 
-@app.command()
-def delete_bk(id: int = None) -> None:
+@app.command(help='Delete bk')
+def del_bk(id: int = None) -> None:
     if not id: 
         bk = get_choose_bk_by_user(con=con)
     else:
@@ -61,7 +61,7 @@ def delete_bk(id: int = None) -> None:
     bk.delete(con=con)
     db_close(con=con)
 
-@app.command()
+@app.command(help='Show collection list')
 def list_col() -> None:
     l_col = get_col_titles(con=con)
     print('id\tname\t\tdescription')
@@ -70,7 +70,7 @@ def list_col() -> None:
     print('-'*50)
     db_close(con=con)
 
-@app.command()
+@app.command(help='Show bk list')
 def list_bk() -> None:
     l_bk = get_bk_titles(con=con)
     print('id\tname\t\tdescription')
@@ -79,7 +79,12 @@ def list_bk() -> None:
     print('-'*50)
     con.close()
 
-@app.command()
+@app.command(help='Show current bk')
+def list_cur_bk() -> None:
+    bk = get_xml_bk(file_pref)
+    print(bk.__str__())
+
+@app.command(help='Showbookmark list')
 def list_marks(id: int = None):
     if not id: 
         bk = get_choose_bk_by_user(con=con)
@@ -100,7 +105,7 @@ def load_bk(id: int = None):
     save_xml_bk(bk=bk)
     con.close()
 
-@app.command()
+@app.command(help='Load all bk from collection')
 def load_col(id: int = None):
     """
     Load chosen collection into preferences
@@ -112,7 +117,7 @@ def load_col(id: int = None):
     save_xml_col(col=c)
     con.close()
 
-@app.command()
+@app.command(help='Rewrite bk in Database')
 def replace(id: int = None):
     """
     Replace bk in DB
@@ -128,7 +133,7 @@ def replace(id: int = None):
     bk_new.save(con=con)
     db_close(con=con)
 
-@app.command()
+@app.command(help='Save bk into Database')
 def save_bk(title: str = None, descr: str = None):
     """
     Save current BookmarkWorksheet into DB
@@ -145,8 +150,8 @@ def save_bk(title: str = None, descr: str = None):
     bk.save(con=con)
     db_close(con=con)
 
-@app.command()
-def update_bk(id: int = None, title: str = None, descr: str = None):
+@app.command(help='Update bk in Database')
+def upd_bk(id: int = None, title: str = None, descr: str = None):
     if not id: 
         bk = get_choose_bk_by_user(con=con)
     else:
@@ -156,8 +161,8 @@ def update_bk(id: int = None, title: str = None, descr: str = None):
     bk.update(con=con)
     db_close(con=con)
 
-@app.command()
-def update_bk_marks_descr(id: int = None):
+@app.command(help='Update bookmarks description')
+def upd_bk_marks_descr(id: int = None):
     if not id: 
         bk = get_choose_bk_by_user(con=con)
     else:
@@ -171,8 +176,8 @@ def update_bk_marks_descr(id: int = None):
         print('\n')
     db_close(con=con)
 
-@app.command()
-def update_bk_mark(id: int):
+@app.command(help='Update bookmark')
+def upd_bk_mark(id: int):
     mark = Bookmark(con=con, t=tuple([id]))
     mark.change_line(con=con)
     mark.change_hotkey(con=con)

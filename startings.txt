@@ -1,10 +1,10 @@
 python bk.py add-bk-to-col --id-bk=<id_bk> --id-col=<id_col>
 python bk.py create-col
 python bk.py create-col --title="<title>" --descr="<descr>"
-python bk.py delete-bk
-python bk.py delete-bk --id=<id>
-python bk.py delete-col
-python bk.py delete-col --id=<id>
+python bk.py del-bk
+python bk.py del-bk --id=<id>
+python bk.py del-col
+python bk.py del-col --id=<id>
 python bk.py list-bk
 python bk.py list-col
 python bk.py list-marks --id=<id>

@@ -123,6 +123,9 @@ class BK:
         res += '      </list>\n'
         res += '   </hash>\n'
         return res
+    
+    def __str__(self) -> str:
+        return '\n'.join([x.__str__() for x in self.mark_list])
 
     def get_bk(self, con: connect):
         cur = con.cursor()
@@ -253,7 +256,7 @@ class Bookmark:
         return res
     
     def __str__(self) -> str:
-        return 'id: {id}\nid_bk: {id_bk}\nline: {line}\nhotkey: {hotkey}\nurl: {url}\ndescr: {descr}'.format(id=self.id, id_bk=self.id_bk, line=self.line, hotkey=self.hotkey, url=self.url, descr=self.descr)
+        return 'id: {id}\nid_bk: {id_bk}\nline: {line}\nhotkey: {hotkey}\nurl: {url}\ndescr: {descr}\n'.format(id=self.id, id_bk=self.id_bk, line=self.line, hotkey=self.hotkey, url=self.url, descr=self.descr)
     
     def change_descr(self) -> str:
         while True:
